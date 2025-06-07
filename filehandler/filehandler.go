@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-func CreateFile(fileName string) {
+func CreateFile(fileName string, content string) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		panic(err)
@@ -24,5 +24,5 @@ func CreateFile(fileName string) {
 		panic(err)
 	}
 	defer file.Close()
-	fmt.Fprintln(file, "Hello")
+	fmt.Fprintln(file, content)
 }

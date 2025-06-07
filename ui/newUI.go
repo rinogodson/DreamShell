@@ -1,6 +1,10 @@
 package ui
 
 import (
+	"fmt"
+	"rinogodson/DreamShell/filehandler"
+	"time"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -89,6 +93,11 @@ func NewUI() {
 			app.Stop()
 		} else if event.Key() == tcell.KeyCtrlG {
 			state.selectedPane = (state.selectedPane + 1) % 3
+		} else if event.Key() == tcell.KeyCtrlW {
+			filehandler.CreateFile(titleArea.GetText(), "# "+titleArea.GetText()+"\n"+bodyArea.GetText()+"\n"+tagArea.GetText())
+			app.Stop()
+			fmt.Println("Dream Logged Successfully: " + titleArea.GetText())
+			fmt.Println("on "+time.Now().String())
 		}
 		return event
 	})
