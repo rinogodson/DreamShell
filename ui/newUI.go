@@ -48,7 +48,7 @@ func NewUI() {
 	tagArea.SetPlaceholderStyle(tcell.StyleDefault.Foreground(tcell.ColorSilver))
 
 	helpArea := tview.NewTextView()
-	helpArea.SetText(" Ctrl+h for help")
+	helpArea.SetText(" Ctrl+i for help")
 	helpArea.SetTextStyle(tcell.StyleDefault.Foreground(tcell.ColorSilver).Bold(true))
 	helpArea.SetTextAlign(tview.AlignRight)
 
@@ -89,7 +89,27 @@ func NewUI() {
 	mainView.SetTitleColor(tcell.Color225)
 	mainView.SetBorderPadding(1, 0, 3, 3)
 
-	mainView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+	modal := func(p tview.Primitive, width, height int) tview.Primitive {
+		return tview.NewFlex().
+			AddItem(nil, 0, 1, false).
+			AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+				AddItem(nil, 0, 1, false).
+				AddItem(p, height, 1, true).
+				AddItem(nil, 0, 1, false), width, 1, true).
+			AddItem(nil, 0, 1, false)
+	}
+
+	help := tview.NewTextView()
+	help.SetText("Ctrl + i for help\nCtrl + c to close\nCtrl + w to log the dream\nCtrl + n for next pane\nCtrl + b to previous pane\nCtrl + x to exit").SetBorder(true)
+	help.SetTextStyle(tcell.StyleDefault.Foreground(tcell.ColorSilver).Bold(true))
+	help.SetTextAlign(tview.AlignLeft)
+	help.SetBorderPadding(1, 0, 2, 2)
+	help.SetTitle("[#FFFFFF]─╮ [#FFFFD7]✦[#AFAFFF] Help [#FFFFD7]✦[#FFFFFF] ╭──")
+
+	helpLever := false
+	container := tview.NewPages()
+	container.AddPage("main", mainView, true, true)
+	container.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyCtrlX {
 			app.Stop()
 		} else if event.Key() == tcell.KeyCtrlG {
@@ -105,15 +125,16 @@ func NewUI() {
 				fmt.Println("Dream Logged Successfully: " + titleArea.GetText())
 				fmt.Println("on " + time.Now().String())
 			}
-		} else if event.Key() == tcell.KeyCtrlH {
-
+		} else if event.Key() == tcell.KeyCtrlI {
+			helpLever = !helpLever
+			if helpLever {
+				container.AddPage("modal", modal(help, 40, 10), true, true)
+			} else {
+				container.RemovePage("modal")
+			}
 		}
 		return event
 	})
-
-	container := tview.NewFlex()
-	container.SetDirection(tview.FlexRow)
-	container.AddItem(mainView, 0, 5, true)
 
 	if err := app.SetRoot(container,
 		true).EnableMouse(true).Run(); err != nil {
