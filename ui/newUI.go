@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"rinogodson/DreamShell/filehandler"
+	"strings"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
@@ -94,17 +95,25 @@ func NewUI() {
 		} else if event.Key() == tcell.KeyCtrlG {
 			state.selectedPane = (state.selectedPane + 1) % 3
 		} else if event.Key() == tcell.KeyCtrlW {
-			filehandler.CreateFile(titleArea.GetText(), "# "+titleArea.GetText()+"\n"+bodyArea.GetText()+"\n"+tagArea.GetText())
-			app.Stop()
-			fmt.Println("Dream Logged Successfully: " + titleArea.GetText())
-			fmt.Println("on "+time.Now().String())
+			if !filehandler.TagValidator(tagArea.GetText()) {
+				tagArea.SetTitle("[#AFAFFF]─╮ [#FFFFD7]✦[#FF0000] Tags: Format Error [#FFFFD7]✦[#AFAFFF] ╭──")
+				tagArea.SetTitleColor(tcell.ColorRed)
+			} else {
+				tags := filehandler.ExtractTags(tagArea.GetText())
+				filehandler.CreateFile(titleArea.GetText()+time.Now().String(), "# "+titleArea.GetText()+"\n"+bodyArea.GetText()+"\n"+strings.Join(tags, " "))
+				app.Stop()
+				fmt.Println("Dream Logged Successfully: " + titleArea.GetText())
+				fmt.Println("on " + time.Now().String())
+			}
+		} else if event.Key() == tcell.KeyCtrlH {
+
 		}
 		return event
 	})
 
 	container := tview.NewFlex()
 	container.SetDirection(tview.FlexRow)
-	container.AddItem(mainView, 0, 1, true)
+	container.AddItem(mainView, 0, 5, true)
 
 	if err := app.SetRoot(container,
 		true).EnableMouse(true).Run(); err != nil {
