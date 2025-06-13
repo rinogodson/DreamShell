@@ -26,3 +26,12 @@ func CreateFile(fileName string, content string) {
 	defer file.Close()
 	fmt.Fprintln(file, content)
 }
+
+func GetFiles() []os.DirEntry {
+	home, err := os.UserHomeDir()
+	files, err := os.ReadDir(filepath.Join(home, ".dreamshell", "dreams"))
+	if err != nil {
+		panic(err)
+	}
+	return files
+}

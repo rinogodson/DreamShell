@@ -48,7 +48,7 @@ func NewUI() {
 	tagArea.SetPlaceholderStyle(tcell.StyleDefault.Foreground(tcell.ColorSilver))
 
 	helpArea := tview.NewTextView()
-	helpArea.SetText(" Ctrl+i for help")
+	helpArea.SetText("╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍ TAB for help ")
 	helpArea.SetTextStyle(tcell.StyleDefault.Foreground(tcell.ColorSilver).Bold(true))
 	helpArea.SetTextAlign(tview.AlignRight)
 
@@ -100,7 +100,7 @@ func NewUI() {
 	}
 
 	help := tview.NewTextView()
-	help.SetText("Ctrl + i for help\nCtrl + c to close\nCtrl + w to log the dream\nCtrl + n for next pane\nCtrl + b to previous pane\nCtrl + x to exit").SetBorder(true)
+	help.SetText("Ctrl + i for help\nCtrl + w to log the dream\nCtrl + n for next pane\nCtrl + b for previous pane\nCtrl + x to exit\n\nTags Syntax:\n  #tag1 #tag2 ... #tagn\n\n  add #lucid if it was lucid").SetBorder(true)
 	help.SetTextStyle(tcell.StyleDefault.Foreground(tcell.ColorSilver).Bold(true))
 	help.SetTextAlign(tview.AlignLeft)
 	help.SetBorderPadding(1, 0, 2, 2)
@@ -108,7 +108,9 @@ func NewUI() {
 
 	helpLever := false
 	container := tview.NewPages()
-	container.AddPage("main", mainView, true, true)
+	container.AddPage("main", modal(mainView, 70, 35), true, true)
+	container.AddPage("modal", modal(help, 40, 14), true, true)
+	container.HidePage("modal")
 	container.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyCtrlX {
 			app.Stop()
@@ -120,7 +122,7 @@ func NewUI() {
 				tagArea.SetTitleColor(tcell.ColorRed)
 			} else {
 				tags := filehandler.ExtractTags(tagArea.GetText())
-				filehandler.CreateFile(titleArea.GetText()+time.Now().String(), "# "+titleArea.GetText()+"\n"+bodyArea.GetText()+"\n"+strings.Join(tags, " "))
+				filehandler.CreateFile(titleArea.GetText()+"~"+time.Now().String(), "# "+titleArea.GetText()+"\n"+bodyArea.GetText()+"\n"+strings.Join(tags, " "))
 				app.Stop()
 				fmt.Println("Dream Logged Successfully: " + titleArea.GetText())
 				fmt.Println("on " + time.Now().String())
@@ -128,9 +130,14 @@ func NewUI() {
 		} else if event.Key() == tcell.KeyCtrlI {
 			helpLever = !helpLever
 			if helpLever {
-				container.AddPage("modal", modal(help, 40, 10), true, true)
+				container.ShowPage("modal")
 			} else {
-				container.RemovePage("modal")
+				container.HidePage("modal")
+			}
+			if len(titleArea.GetText()) != 0 {
+				if titleArea.GetText()[len(titleArea.GetText())-1] == '\t' {
+					titleArea.SetText(titleArea.GetText()[:len(titleArea.GetText())-1], true)
+				}
 			}
 		}
 		return event
