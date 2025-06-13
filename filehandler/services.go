@@ -41,4 +41,3 @@ func ParseInput(input string) []string {
 
 	return []string{title, formattedDate}
 }
-
