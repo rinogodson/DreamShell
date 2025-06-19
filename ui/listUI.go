@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"os"
+	"path/filepath"
 	"rinogodson/DreamShell/filehandler"
 
 	"github.com/gdamore/tcell/v2"
@@ -12,7 +14,6 @@ func ListUI() {
 
 	list := tview.NewList()
 	list.SetBorder(true)
-	list.SetTitle("[#D787FF]╯✨[#FFD8FF] Dreams [#D787FF]✨[#D787FF]╰")
 	list.SetTitleColor(tcell.Color225)
 	list.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyCtrlJ {
@@ -31,12 +32,24 @@ func ListUI() {
 	}
 
 	listBox := tview.NewFlex()
-	listBox.SetTitle("[#D787FF]╯✨[#FFD8FF] DreamShell ✨[#D787FF]╰").SetBorder(true)
+	listBox.SetTitle("[#D787FF]╯✨[#FFD8FF] DreamShell (list) ✨[#D787FF]╰").SetBorder(true)
 	listBox.SetBorderColor(tcell.Color177)
 	listBox.SetTitleColor(tcell.Color225)
-	listBox.SetBorderPadding(1, 0, 3, 3)
-
+	listBox.SetBorderPadding(1, 1, 3, 3)
 	listBox.AddItem(list, 0, 1, true)
+
+	previewBox := tview.NewFlex()
+	previewBox.SetBorder(true)
+	previewBox.SetBorderColor(tcell.Color177)
+	previewBox.SetTitleColor(tcell.Color225)
+	previewBox.SetDirection(tview.FlexRow)
+
+	pTitle := tview.NewTextView()
+	pDesc := tview.NewTextView()
+	pDate := tview.NewTextView()
+	previewBox.AddItem(pTitle, 0, 1, true)
+	previewBox.AddItem(pDesc, 0, 1, true)
+	previewBox.AddItem(pDate, 0, 1, true)
 
 	modal := func(p tview.Primitive, width, height int) tview.Primitive {
 		return tview.NewFlex().
@@ -50,6 +63,21 @@ func ListUI() {
 
 	container := tview.NewPages()
 	container.AddPage("main", modal(listBox, 70, 35), true, true)
+	container.AddPage("preview", modal(previewBox, 64, 31), true, true)
+	container.HidePage("preview")
+
+	list.SetSelectedFunc(func(index int, primaryText string, secondaryText string, _ rune) {
+		container.ShowPage("preview")
+		home, err := os.UserHomeDir()
+		if err != nil {
+			panic(err)
+		}
+		text := filehandler.GetContent(filepath.Join( home, ".dreamshell", "dreams", dreams[index].Name()))
+		pTitle.SetText(primaryText)
+		pDesc.SetText(text)
+		pDate.SetText(secondaryText)
+	})
+
 	if err := app.SetRoot(container,
 		true).EnableMouse(true).Run(); err != nil {
 		panic(err)

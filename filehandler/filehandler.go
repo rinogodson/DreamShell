@@ -35,3 +35,11 @@ func GetFiles() []os.DirEntry {
 	}
 	return files
 }
+
+func GetContent(input string) string {
+  textContent, err := os.ReadFile(input) 
+	if err != nil {
+		panic(err)
+	}
+	return string(textContent)
+}
