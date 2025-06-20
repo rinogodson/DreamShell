@@ -1,5 +1,17 @@
+![DreamShell](https://github.com/rinogodson/DreamShell/blob/main/banner.png?raw=true)
 # DreamShell
 It is an amazing CLI apps to write your dream journals in a retro cybercore-y way... ;)
+
+## Installation
+For Linux/MacOS:
+```
+sudo curl -sL https://github.com/rinogodson/DreamShell/releases/latest/download/install.sh | bash
+```
+On Linux, run this after installation:
+```
+echo "export PATH=\"$HOME/.local/bin:$PATH\"" >> ~/.bashrc; source ~/.bashrc
+```
+No Windows Support (FileSystem Sucks)
 
 Commands:
 1. `new` to create a new dream
@@ -22,3 +34,4 @@ Tags Syntax:
   #tag1 #tag2 ... #tagn      
                              
   add #lucid if it was lucid 
+
