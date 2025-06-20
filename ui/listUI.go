@@ -44,12 +44,17 @@ func ListUI() {
 	previewBox.SetTitleColor(tcell.Color225)
 	previewBox.SetDirection(tview.FlexRow)
 
-	pTitle := tview.NewTextView()
+	pTitle := tview.NewTextView().SetTextAlign(tview.AlignCenter).SetTextColor(tcell.Color225)
 	pDesc := tview.NewTextView()
-	pDate := tview.NewTextView()
+	pDesc.SetBorderPadding(1,1,3,3)
+	pDate := tview.NewTextView().SetTextAlign(tview.AlignCenter)
+	ptags := tview.NewTextView().SetTextAlign(tview.AlignCenter).SetTextColor(tcell.Color225)
+	phelp := tview.NewTextView().SetText("ESC TO CLOSE").SetTextAlign(tview.AlignRight).SetTextColor(tcell.ColorGray)
 	previewBox.AddItem(pTitle, 1, 1, false)
 	previewBox.AddItem(pDesc, 0, 1, true)
 	previewBox.AddItem(pDate, 1, 1, false)
+	previewBox.AddItem(ptags, 1, 1, false)
+	previewBox.AddItem(phelp, 1, 1, false)
 
 	modal := func(p tview.Primitive, width, height int) tview.Primitive {
 		return tview.NewFlex().
@@ -63,7 +68,7 @@ func ListUI() {
 
 	container := tview.NewPages()
 	container.AddPage("main", modal(listBox, 70, 35), true, true)
-	container.AddPage("preview", modal(previewBox, 64, 31), true, true)
+	container.AddPage("preview", modal(previewBox, 66, 33), true, true)
 	container.HidePage("preview")
 
 	list.SetSelectedFunc(func(index int, primaryText string, secondaryText string, _ rune) {
@@ -76,7 +81,15 @@ func ListUI() {
 		textContent := filehandler.ParseDream(text)
 		pTitle.SetText(textContent[0])
 		pDesc.SetText(textContent[1])
+		ptags.SetText(textContent[2])
 		pDate.SetText(secondaryText)
+	})
+
+	previewBox.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyEscape {
+			container.HidePage("preview")
+		}
+		return event
 	})
 
 	if err := app.SetRoot(container,
