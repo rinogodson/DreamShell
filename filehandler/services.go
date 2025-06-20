@@ -25,7 +25,6 @@ func ExtractTags(content string) []string {
 	return tags
 }
 
-
 func ParseInput(input string) []string {
 	parts := strings.SplitN(input, "~", 2)
 	if len(parts) != 2 {

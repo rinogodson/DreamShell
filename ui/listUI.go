@@ -47,9 +47,9 @@ func ListUI() {
 	pTitle := tview.NewTextView()
 	pDesc := tview.NewTextView()
 	pDate := tview.NewTextView()
-	previewBox.AddItem(pTitle, 0, 1, true)
+	previewBox.AddItem(pTitle, 1, 1, false)
 	previewBox.AddItem(pDesc, 0, 1, true)
-	previewBox.AddItem(pDate, 0, 1, true)
+	previewBox.AddItem(pDate, 1, 1, false)
 
 	modal := func(p tview.Primitive, width, height int) tview.Primitive {
 		return tview.NewFlex().
@@ -72,9 +72,10 @@ func ListUI() {
 		if err != nil {
 			panic(err)
 		}
-		text := filehandler.GetContent(filepath.Join( home, ".dreamshell", "dreams", dreams[index].Name()))
-		pTitle.SetText(primaryText)
-		pDesc.SetText(text)
+		text := filehandler.GetContent(filepath.Join(home, ".dreamshell", "dreams", dreams[index].Name()))
+		textContent := filehandler.ParseDream(text)
+		pTitle.SetText(textContent[0])
+		pDesc.SetText(textContent[1])
 		pDate.SetText(secondaryText)
 	})
 
