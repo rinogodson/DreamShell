@@ -29,22 +29,6 @@ func CreateFile(fileName string, content string) {
 	fmt.Fprintln(file, content)
 }
 
-func localParseInput(input string) []string {
-	parts := strings.SplitN(input, "~", 2)
-	if len(parts) != 2 {
-		return []string{"", ""}
-	}
-	title := parts[0]
-	dateStr := strings.TrimSuffix(parts[1], ".md")
-	layout := "2006-01-02 15:04:05.999999 -0700"
-	t, err := time.Parse(layout, dateStr)
-	if err != nil {
-		fmt.Println("Parse error:", err)
-		return []string{title, ""}
-	}
-	dateString := t.Format("02 January 2006 03:04:05 PM MST -0700")
-	return []string{title, dateString}
-}
 
 func GetFiles() []os.DirEntry {
 	home, err := os.UserHomeDir()
@@ -56,29 +40,6 @@ func GetFiles() []os.DirEntry {
 	if err != nil {
 		panic(err)
 	}
-	sort.Slice(files, func(i, j int) bool {
-		filePathI := filepath.Join(dirPath, files[i].Name())
-		filePathJ := filepath.Join(dirPath, files[j].Name())
-		dateStrI := localParseInput(filePathI)[1]
-		dateStrJ := localParseInput(filePathJ)[1]
-		const layout = "02 January 2006 03:04:05 PM MST -0700"
-		var createdI, createdJ time.Time
-		if dateStrI != "" {
-			createdI, err = time.Parse(layout, dateStrI)
-			if err != nil {
-				fmt.Println("Parse error for", filePathI, ":", err)
-				return true
-			}
-		}
-		if dateStrJ != "" {
-			createdJ, err = time.Parse(layout, dateStrJ)
-			if err != nil {
-				fmt.Println("Parse error for", filePathJ, ":", err)
-				return false
-			}
-		}
-		return createdI.Before(createdJ)
-	})
 	return files
 }
 
